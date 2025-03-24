@@ -37,9 +37,9 @@ class Program
 		}
 		Settings = SettingsHelpers.ReadSettings();
 		ImageFileExtensions = new List<string>() { ".webp", ".jpg", ".jpeg", ".png", ".gif" };
-		VideoFileExtensions = new List<string>() { ".mp4", ".webm", ".mkv", ".avi", ".flv" };
+		VideoFileExtensions = new List<string>() { ".mp4", ".webm", ".mkv", ".avi", ".flv", ".mpeg", ".mov", ".asf", ".mpg" };
 		ValidExtensions = new HashSet<string>() { ".webp", ".jpg", ".jpeg", ".png", ".gif",
-			".mp4", ".webm", ".mkv", ".avi", ".flv" };
+			".mp4", ".webm", ".mkv", ".avi", ".flv", ".mpeg", ".mov", ".asf", ".mpg" };
 
 		BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
 	}
@@ -48,8 +48,8 @@ class Program
 	public static AppBuilder BuildAvaloniaApp()
 	{
 		return AppBuilder.Configure<App>()
-				.UsePlatformDetect()
-				.WithInterFont()
-				.LogToTrace();
+				.UsePlatformDetect()				
+				.WithInterFont();
+		//.LogToTrace();
 	}
 }

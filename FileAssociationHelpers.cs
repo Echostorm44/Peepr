@@ -11,10 +11,7 @@ using System.Threading.Tasks;
 namespace Peepr;
 // Computer\HKEY_CURRENT_USER\Software\Classes\.webp\OpenWithProgids
 // Computer\HKEY_CURRENT_USER\Software\Classes\Microsoft\Windows\CurrentVersion\Explorer\FileExts\.webp\UserChoice +OpenWithList +OpenWithProgIDS
-
 //var CurrentUser = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\FileExts\\" + ".webp", true);
-//CurrentUser.DeleteSubKey("UserChoice", false);
-//CurrentUser.Close();
 
 public enum ExtensionTypeToRegister
 {
