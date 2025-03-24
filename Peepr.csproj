@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+		<PublishAot>true</PublishAot>
+		<TrimMode>link</TrimMode>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+		<ServerGarbageCollection>false</ServerGarbageCollection>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+        <ApplicationIcon>Images\Peepr.ico</ApplicationIcon>
+    </PropertyGroup>
+    <ItemGroup>
+      <Content Include="Images\Peepr.ico" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="11.2.5" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.2.5" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.5" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.5" />
+        <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.2.5">
+            <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+            <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="LibVLCSharp" Version="3.9.2" />
+        <PackageReference Include="LibVLCSharp.Avalonia" Version="3.9.2" />
+        <PackageReference Include="System.Reactive" Version="6.0.1" />
+        <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
+		<TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
+    </ItemGroup>
+</Project>

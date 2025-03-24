@@ -1,0 +1,88 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:Peepr;assembly=Peepr"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Peepr.MainWindow" Closing="Window_Closing" WindowStartupLocation="Manual"
+		xmlns:vid="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia" 
+        Title="Peepr">
+	<SplitView Name="settingPanel" IsPaneOpen="False" DisplayMode="Overlay" 
+			   PanePlacement="Right"
+			   OpenPaneLength="300">
+		<SplitView.Pane>			
+			<StackPanel Orientation="Vertical" Spacing="10" Margin="8" ZIndex="3">
+				<TextBlock FontSize="22">Settings</TextBlock>
+				<Button Name="btnCheckForUpdates" Focusable="False"
+						Click="CheckForUpdatesClick">🔄 Check For Updates</Button>
+				<Button Name="btnSetDefaultForImages" Click="RegisterImageExtensions" 
+						Focusable="False">📷 Set Default For Images</Button>
+				<Button Name="btnSetDefaultForVideos" Click="RegisterVideoExtensions"
+						Focusable="False">🎥 Set Default For Videos</Button>
+				<Button Name="btnUnregisterExtensions" Click="UnregisterAllExtensions" 
+						Focusable="False">⚰ Unregister Extensions</Button>
+				<CheckBox Name="chkWarnBeforeDelete" Unchecked="WarnBeforeDeleteChecked"
+						  Checked="WarnBeforeDeleteChecked">⚠ Warn Before Delete</CheckBox>				
+				<TextBlock FontSize="16">Slideshow Seconds</TextBlock>
+				<NumericUpDown Name="txtSlideShowSeconds" Minimum="1" Maximum="9999" Value="1"
+							   Increment="1" ParsingNumberStyle="Integer" 
+							   ValueChanged="SlideShowSecondsChanged"
+							  Focusable="False"></NumericUpDown>
+				<Button Click="AboutButtonClick" Focusable="False">💡 About</Button>
+			</StackPanel>
+		</SplitView.Pane>
+		<Grid Name="mainGrid">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"></RowDefinition>
+				<RowDefinition Height="*"></RowDefinition>
+			</Grid.RowDefinitions>
+			<StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="1">
+				<Button Name="btnPrev" Click="PrevButtonClick" Focusable="False">◀</Button>
+				<Button Name="btnNext" Click="NextButtonClick" Focusable="False">▶</Button>
+				<Button Name="btnOpen" Click="OpenFileButtonClick" Focusable="False">📂</Button>				
+				<Button Name="btnSettings" Click="SettingButtonClick" Focusable="False">⚙</Button>
+				<Button Name="btnSlideshow" Click="SlideShowButtonClick" Focusable="False">🎥</Button>	
+				<Button Click="DeleteButtonClick" Margin="15,0" 
+						ToolTip.Tip="Delete File" ToolTip.Placement="Right"
+						Focusable="False">🗑</Button>							
+			</StackPanel>
+
+			<local:CustomImageViewer x:Name="imageViewer" Stretch="Uniform" Grid.Row="1"
+									 IsVisible="False" Focusable="False"
+									 HorizontalAlignment="Stretch"
+									 VerticalAlignment="Stretch"/>
+			
+			<vid:VideoView x:Name="videoViewer" Grid.Row="1" HorizontalAlignment="Stretch"
+						   IsVisible="True" Focusable="False" IsHitTestVisible="False"
+						   PointerEntered="VideoView_PointerEntered" 
+						   PointerExited="VideoView_PointerExited"
+						   VerticalAlignment="Stretch">							
+				<DockPanel Name="pnlVideoControls" LastChildFill="True"
+					   Focusable="False">
+					<StackPanel Orientation="Vertical" Margin="5" Focusable="False" DockPanel.Dock="Bottom">
+						<Slider Name="VideoSeekSlider" Minimum="0" Maximum="100" Padding="20 0"
+								 Focusable="False"
+								ValueChanged="VideoSeekSlider_ValueChanged"></Slider>
+						<StackPanel Orientation="Horizontal" HorizontalAlignment="Center"
+									 Focusable="False" Spacing="10">
+							<Button x:Name="TogglePlayPauseButton" Focusable="False"
+									Click="OnTogglePlayPauseClick">
+								<TextBlock x:Name="PauseIcon" FontSize="20" Text="⏸" Focusable="False"/>
+							</Button>
+
+							<Button x:Name="btnVideoMute" VerticalAlignment="Center" Focusable="False"
+									Click="VideoMute_Click">
+								<TextBlock x:Name="MuteIcon" FontSize="20" Text="🔊" Focusable="False"/>
+							</Button>
+							<Slider x:Name="VideoVolumeSlider" Minimum="0" Maximum="100" Focusable="False"
+									ValueChanged="VideoVolumeSlider_ValueChanged"
+									 Width="150"/>
+						</StackPanel>
+					</StackPanel>
+					<Grid/><!-- This is needed to make sure the controls render at the bottom because of a quirk -->					
+				</DockPanel>
+			</vid:VideoView>		
+			
+		</Grid>
+	</SplitView>
+</Window>
