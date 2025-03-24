@@ -36,8 +36,8 @@ public class CustomImageViewer : Image
 					using var stream = File.OpenRead(imgPath);
 					using var codec = SKCodec.Create(stream);
 
-					Dispatcher.UIThread.Invoke(() => parentWindow.Title += " | " + codec.Info.Width + "x" + codec.Info.Height);
-					//extraDeetz = " | " + codec.Info.Width + "x" + codec.Info.Height;
+					Dispatcher.UIThread.Invoke(() => parentWindow.Title += " | " + 
+						codec.Info.Width + "x" + codec.Info.Height);
 					var frameCount = codec.FrameCount;
 					if(frameCount > 1)
 					{

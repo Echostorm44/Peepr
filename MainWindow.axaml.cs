@@ -23,8 +23,10 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -43,7 +45,7 @@ public partial class MainWindow : Window
 	List<string> AllFiles = new List<string>();
 	private int VisibleFileCounter = 0;
 	public string CurrentFileDeetz { get; set; }
-	private readonly LibVLC libVLC;
+	private LibVLC libVLC;
 	private MediaPlayer CurrentMediaPlayer;
 	private Media? CurrentMovie;
 	private bool VideoIsSeeking = false;
@@ -66,7 +68,7 @@ public partial class MainWindow : Window
 			string[] args = Environment.GetCommandLineArgs();
 			var imageToLoaad = args.Skip(1).FirstOrDefault();
 			PeeprWindowHandle = (this.TryGetPlatformHandle()?.Handle) ?? IntPtr.Zero;
-			Core.Initialize();// Gotta call this for VLC
+			//Core.Initialize();
 			libVLC = new LibVLC();
 			CurrentMediaPlayer = new MediaPlayer(libVLC);
 
@@ -155,9 +157,6 @@ public partial class MainWindow : Window
 				// the first && subsequent loads.			
 				videoViewer.MediaPlayer = CurrentMediaPlayer;
 				videoViewer.IsVisible = false;
-				//imageToLoaad = @"D:\Projects\Images\AnimatedWebp.webp";
-				//imageToLoaad = @"D:\Projects\Videos\WebMTest.webm";
-				//imageToLoaad = @"D:\Pix\Tablet.jpg";		
 				ScanOpeningFolderAndOpenFile(imageToLoaad);
 			};
 
@@ -165,6 +164,7 @@ public partial class MainWindow : Window
 		}
 		catch(Exception ex)
 		{
+			Helpers.WriteLogEntry(ex.ToString());
 			MessageBox.ShowAsync("Error", ex.ToString(), "OK");
 		}
 	}
@@ -417,10 +417,77 @@ public partial class MainWindow : Window
 
 	private async void CheckForUpdatesClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
 	{
-		//var moo = await MessageBox.ShowAsync("Information", "Your changes have been saved.", "OK", 
-		//	showCancel: true);
-		//var loo = moo;
-		MessageBox.ShowAsync("Information", "Your changes have been saved.", "OK");
+		bool foundUpdate = false;
+		try
+		{
+			var settingsPath = Path.Combine(AppContext.BaseDirectory, "config.json");
+			var settings = JsonSerializer.Deserialize<SetupSettings>(File.ReadAllText(settingsPath),
+					SourceGenerationContext.Default.SetupSettings) ?? new SetupSettings();
+			if(settings.LatestDownloadedUpdateDate == null)
+			{
+				settings.LatestDownloadedUpdateDate = DateTime.MinValue;
+			}
+			if(settings.DoNotDeleteTheseFiles == null)
+			{
+				settings.DoNotDeleteTheseFiles = "";
+			}
+			string GitHubApiBaseUrl = "https://api.github.com/repos/";
+			using var httpClient = new HttpClient();
+			httpClient.DefaultRequestHeaders.Add("User-Agent", "ShipThatLauncher");
+			var apiUrl = $"{GitHubApiBaseUrl}{settings.GithubOwner}/{settings.GithubRepo}/releases";
+			this.Title = $"Checking For Updates At: {apiUrl}";
+			var response = await httpClient.GetAsync(apiUrl);
+			this.Title = $"Reposnse Was {response.StatusCode.ToString()}";
+			if(response.IsSuccessStatusCode)
+			{
+				var content = await response.Content.ReadAsStringAsync();
+				var releases = JsonSerializer.Deserialize<Root[]>(content,
+					SourceGenerationContext.Default.RootArray) ?? new List<Root>().ToArray();
+				foreach(var rel in releases.Where(a => !a.draft))
+				{
+					if(settings.LatestDownloadedUpdateDate >= rel.published_at)
+					{
+						continue;
+					}
+					foreach(var ass in rel.assets)
+					{
+						if(!ass.browser_download_url.EndsWith(settings.ZipName))
+						{
+							continue;
+						}
+						foundUpdate = true;
+					}
+				}
+			}
+			if(foundUpdate)
+			{
+				var choice = await MessageBox.ShowAsync("Information", "Update Found! Install Now?\r\nYou can run this manually by running the launcher.exe file", 
+					"Yes", 
+					"No", showCancel: true);
+				if(choice)
+				{
+					// execute the launcher.exe file in the program root folder && close this application immediately
+					var launcherPath = Path.Combine(AppContext.BaseDirectory, "launcher.exe");
+					ProcessStartInfo startInfo = new ProcessStartInfo
+					{
+						FileName = settings.ExeFileName,
+						UseShellExecute = false,
+					};
+					using Process process = new Process { StartInfo = startInfo };
+					process.Start();
+					Environment.Exit(0);
+				}
+			}
+			else
+			{
+				await MessageBox.ShowAsync("Information", "No update available", "OK");
+			}
+		}
+		catch(Exception ex)
+		{
+			Helpers.WriteLogEntry(ex.ToString());
+			MessageBox.ShowAsync("Error", ex.ToString(), "OK");
+		}
 	}
 
 	private void VideoView_PointerEntered(object? sender, Avalonia.Input.PointerEventArgs e)
@@ -440,24 +507,44 @@ public partial class MainWindow : Window
 			await SettingsHelpers.SaveSettingsAsync(), 1000);
 	}
 
-	private void AboutButtonClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+	private async void AboutButtonClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
 	{
+		var result = await MessageBox.ShowAsync("About Peepr", "Peepr was created by Adam Marciniec " +
+			"It is free and open source, you can view the source at:\r\nhttps://github.com/Echostorm44/Peepr", 
+			cancelText: "Source", showCancel: true);
+		if(!result)
+		{
+			var url = "https://github.com/Echostorm44/Peepr";
+			Process.Start(new ProcessStartInfo
+			{
+				FileName = url,
+				UseShellExecute = true
+			});
+		}
 	}
 
 	private async void SlideShowButtonClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
 	{
-		if(AllFiles.Count < 2)
+		try
 		{
-			return;
+			if(AllFiles.Count < 2)
+			{
+				return;
+			}
+			SlideShowRunning = !SlideShowRunning;
+			while(SlideShowRunning && AllFiles.Count > 1)
+			{
+				btnSlideshow.Background = new SolidColorBrush(Colors.Red);
+				ShowNextFile();
+				await Task.Delay(Program.Settings.SlideShowDelaySeconds * 1000);
+			}
+			btnSlideshow.Background = (ImmutableSolidColorBrush)new BrushConverter().ConvertFromString("#33ffffff");
 		}
-		SlideShowRunning = !SlideShowRunning;
-		while(SlideShowRunning && AllFiles.Count > 1)
+		catch(Exception ex)
 		{
-			btnSlideshow.Background = new SolidColorBrush(Colors.Red);
-			ShowNextFile();
-			await Task.Delay(Program.Settings.SlideShowDelaySeconds * 1000);
+			Helpers.WriteLogEntry(ex.ToString());
+			MessageBox.ShowAsync("Error", ex.ToString(), "OK");
 		}
-		btnSlideshow.Background = (ImmutableSolidColorBrush)new BrushConverter().ConvertFromString("#33ffffff");
 	}
 
 	private void SlideShowSecondsChanged(object? sender, Avalonia.Controls.NumericUpDownValueChangedEventArgs e)

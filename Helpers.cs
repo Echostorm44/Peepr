@@ -27,6 +27,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,27 +36,6 @@ namespace Peepr;
 public static class Helpers
 {
 	public static object lockLog = true;
-
-	// TODO Make update check ref Program.CurrentSoftwareVersion
-	// TODO a function to uninstall the application
-	//public static async Task<ClientInstructions> ApiGetInstructions()
-	//{
-	//	try
-	//	{
-	//		string url = $@"{Program.Settings.TelemetryBaseURL}Telem/GetInstructions/{Program.Settings.SourceID}";
-	//		using (HttpClient client = new HttpClient())
-	//		{
-	//			var resp = await client.GetAsync(url);
-	//			var result = await resp.Content.ReadFromJsonAsync<ClientInstructions>();
-	//			return result;
-	//		}
-	//	}
-	//	catch (Exception ex)
-	//	{
-	//		WriteLogEntry(ex.ToString());
-	//		return null;
-	//	}
-	//}
 
 	public static void OpenLogFile()
 	{
@@ -136,7 +116,7 @@ public class MessageBox : Window
 		{
 			Title = title,
 			Width = 350,
-			Height = 180,
+			Height = 190,
 			CanResize = false,
 			WindowStartupLocation = WindowStartupLocation.CenterOwner,
 			ExtendClientAreaChromeHints = Avalonia.Platform.ExtendClientAreaChromeHints.NoChrome,
@@ -152,7 +132,6 @@ public class MessageBox : Window
 	{
 		ResultTcs = new TaskCompletionSource<bool>();
 
-		// Create custom title bar
 		var titleBarBackground = (ImmutableSolidColorBrush)new BrushConverter().ConvertFromString("#007ACC");
 
 		var titleBlock = new TextBlock
@@ -193,17 +172,20 @@ public class MessageBox : Window
 		titleBar.Children.Add(titleBlock);
 		titleBar.Children.Add(closeButton);
 
-		// Create message text block
 		MessageTextBlock = new TextBlock
 		{
 			Text = message,
 			TextWrapping = TextWrapping.Wrap,
 			Margin = new Thickness(20),
 			HorizontalAlignment = HorizontalAlignment.Center,
-			VerticalAlignment = VerticalAlignment.Center
+			VerticalAlignment = VerticalAlignment.Center,
 		};
 
-		// Create buttons
+		ScrollViewer messageScrollViewer = new ScrollViewer();
+		messageScrollViewer.VerticalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Auto;
+		messageScrollViewer.HorizontalScrollBarVisibility = Avalonia.Controls.Primitives.ScrollBarVisibility.Disabled;
+		messageScrollViewer.Content = MessageTextBlock;
+
 		OKButton = new Button
 		{
 			TabIndex = 0,
@@ -234,7 +216,6 @@ public class MessageBox : Window
 			Close();
 		};
 
-		// Button container
 		var buttonPanel = new StackPanel
 		{
 			Orientation = Orientation.Horizontal,
@@ -248,21 +229,19 @@ public class MessageBox : Window
 		}
 		buttonPanel.Children.Add(OKButton);
 
-		// Main layout
 		var mainPanel = new Grid();
 		mainPanel.RowDefinitions.Add(new RowDefinition(GridLength.Auto)); // Title bar
 		mainPanel.RowDefinitions.Add(new RowDefinition(1, GridUnitType.Star)); // Message
 		mainPanel.RowDefinitions.Add(new RowDefinition(GridLength.Auto)); // Buttons
 
 		Grid.SetRow(titleBar, 0);
-		Grid.SetRow(MessageTextBlock, 1);
+		Grid.SetRow(messageScrollViewer, 1);
 		Grid.SetRow(buttonPanel, 2);
 
 		mainPanel.Children.Add(titleBar);
-		mainPanel.Children.Add(MessageTextBlock);
+		mainPanel.Children.Add(messageScrollViewer);
 		mainPanel.Children.Add(buttonPanel);
 
-		// Add a border around the window
 		var border = new Border
 		{
 			BorderBrush = (ImmutableSolidColorBrush)new BrushConverter().ConvertFromString("#CCCCCC"),
@@ -284,10 +263,42 @@ public class MessageBox : Window
 		}
 	}
 
-	private new async Task<bool> ShowDialogAsync()
+	private async Task<bool> ShowDialogAsync()
 	{
 		await ShowDialog(((IClassicDesktopStyleApplicationLifetime)Application
 			.Current!.ApplicationLifetime!).MainWindow!);
 		return await ResultTcs.Task;
 	}
+}
+
+[JsonSerializable(typeof(Asset))]
+public class Asset
+{
+	public string browser_download_url { get; set; }
+}
+
+[JsonSerializable(typeof(Root))]
+public class Root
+{
+	public bool draft { get; set; }
+	public bool prerelease { get; set; }
+	public DateTime created_at { get; set; }
+	public DateTime published_at { get; set; }
+	public List<Asset> assets { get; set; }
+	public string name { get; set; }
+}
+
+[JsonSerializable(typeof(SetupSettings))]
+public class SetupSettings
+{
+	public string Title { get; set; }
+	public string DefaultInstallFolderName { get; set; }
+	public string ExeFileName { get; set; }
+	public string IconFileName { get; set; }
+	public bool UseLauncher { get; set; }
+	public string GithubOwner { get; set; }
+	public string GithubRepo { get; set; }
+	public string ZipName { get; set; }
+	public DateTime? LatestDownloadedUpdateDate { get; set; }
+	public string DoNotDeleteTheseFiles { get; set; }
 }

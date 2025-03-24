@@ -74,6 +74,9 @@ public class PeeprSettings
 
 //[JsonSourceGenerationOptions(WriteIndented = true, GenerationMode = JsonSourceGenerationMode.Serialization)]
 [JsonSerializable(typeof(PeeprSettings))]
+[JsonSerializable(typeof(SetupSettings))]
+[JsonSerializable(typeof(Asset))]
+[JsonSerializable(typeof(Root[]))]
 [JsonSerializable(typeof(bool))]
 [JsonSerializable(typeof(int))]
 [JsonSerializable(typeof(string))]
