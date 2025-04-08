@@ -10,11 +10,11 @@ namespace Peepr;
 class Program
 {
 	public static readonly string DataFolderPath =
-		Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
+		Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
 			+ "\\Peepr\\";
 
 	public static readonly string LogFolderPath =
-		Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
+		Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
 			+ "\\Peepr\\Logs\\";
 	public static List<string> ImageFileExtensions { get; set; }
 	public static List<string> VideoFileExtensions { get; set; }
