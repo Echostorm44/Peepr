@@ -3,10 +3,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:Peepr;assembly=Peepr"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" Loaded="Window_Loaded"
         x:Class="Peepr.MainWindow" Closing="Window_Closing" WindowStartupLocation="Manual"
 		xmlns:vid="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia" 
-        Title="Peepr">
+        Title="Peepr">	
 	<SplitView Name="settingPanel" IsPaneOpen="False" DisplayMode="Overlay" 
 			   PanePlacement="Right"
 			   OpenPaneLength="300">
@@ -30,8 +30,8 @@
 							  Focusable="False"></NumericUpDown>
 				<Button Click="AboutButtonClick" Focusable="False">💡 About</Button>
 			</StackPanel>
-		</SplitView.Pane>
-		<Grid Name="mainGrid">
+		</SplitView.Pane>		
+		<Grid Name="mainGrid">			
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto"></RowDefinition>
 				<RowDefinition Height="*"></RowDefinition>
@@ -46,7 +46,10 @@
 						ToolTip.Tip="Delete File" ToolTip.Placement="Right"
 						Focusable="False">🗑</Button>							
 			</StackPanel>
-
+			<local:ProgressRing x:Name="progRing" Width="110" Height="110" IsActive="True" 
+								Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" 
+								Foreground="LightBlue" Margin="10">				
+			</local:ProgressRing>
 			<local:CustomImageViewer x:Name="imageViewer" Stretch="Uniform" Grid.Row="1"
 									 IsVisible="False" Focusable="False"
 									 HorizontalAlignment="Stretch"
@@ -54,8 +57,8 @@
 			
 			<vid:VideoView x:Name="videoViewer" Grid.Row="1" HorizontalAlignment="Stretch"
 						   IsVisible="True" Focusable="False" IsHitTestVisible="False"
-						   PointerEntered="VideoView_PointerEntered" 
-						   PointerExited="VideoView_PointerExited"
+						   PointerEntered="VideoView_PointerEntered" Opacity="0" 
+						   PointerExited="VideoView_PointerExited" 
 						   VerticalAlignment="Stretch">							
 				<DockPanel Name="pnlVideoControls" LastChildFill="True"
 					   Focusable="False">

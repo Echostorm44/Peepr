@@ -16,6 +16,7 @@ using Avalonia.Media;
 using Avalonia.Media.Immutable;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using LibVLCSharp.Shared;
 using System;
 using System.Collections.Generic;
@@ -61,16 +62,31 @@ public partial class MainWindow : Window
 	{
 		InitializeComponent();
 		this.DataContext = this;
+	}
+
+	private async void Window_Loaded(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+	{
 		try
 		{
+			if(videoViewer.IsAttachedToVisualTree())
+			{
+				videoViewer.IsVisible = false;
+			}
 			this.Position = new PixelPoint(Program.Settings.LastX, Program.Settings.LastY);
 			imageViewer.IsVisible = true;
 			string[] args = Environment.GetCommandLineArgs();
 			var imageToLoaad = args.Skip(1).FirstOrDefault();
 			PeeprWindowHandle = (this.TryGetPlatformHandle()?.Handle) ?? IntPtr.Zero;
-			//Core.Initialize();
-			libVLC = new LibVLC();
-			CurrentMediaPlayer = new MediaPlayer(libVLC);
+
+			// Loading VLC can take several seconds but not all the time, I have not found a pattern but when it does
+			// it locaks up the gui thread so we run it in a new thread so the UI isn't blocked && we can show
+			// a spinner to let them know the app is working.
+			await Task.Run(() =>
+			{
+				Core.Initialize();
+				libVLC = new LibVLC();
+				CurrentMediaPlayer = new MediaPlayer(libVLC);
+			});
 
 			CurrentMediaPlayer.EndReached += (_, _) =>
 			{// this is because of a weird quirk where the callback happens on a different thread
@@ -147,18 +163,25 @@ public partial class MainWindow : Window
 				});
 			};
 
-			videoViewer.AttachedToVisualTree += (_, _) =>
-			{
-				// This is because the MediaPlayer is not attached to the visual tree if we set it before this && 
-				// videos will play in a weird external window. So we wait until it's attached to set it.
-				// We also don't try to load anything because if it is a video mediaplayer would be null
-				// I don't love this but I don't see a better option right now && I don't want to do a double type check
-				// here && hope that it loads if a video comes up. This way we're positive everything is ready on
-				// the first && subsequent loads.			
-				videoViewer.MediaPlayer = CurrentMediaPlayer;
-				videoViewer.IsVisible = false;
-				ScanOpeningFolderAndOpenFile(imageToLoaad);
-			};
+			//videoViewer.AttachedToVisualTree += (_, _) =>
+			//{
+			//	// This is because the MediaPlayer is not attached to the visual tree if we set it before this && 
+			//	// videos will play in a weird external window. So we wait until it's attached to set it.
+			//	// We also don't try to load anything because if it is a video mediaplayer would be null
+			//	// I don't love this but I don't see a better option right now && I don't want to do a double type check
+			//	// here && hope that it loads if a video comes up. This way we're positive everything is ready on
+			//	// the first && subsequent loads.			
+			//	videoViewer.MediaPlayer = CurrentMediaPlayer;
+			//	videoViewer.IsVisible = false;
+			//	ScanOpeningFolderAndOpenFile(imageToLoaad);
+			//};
+
+			videoViewer.MediaPlayer = CurrentMediaPlayer;
+			videoViewer.IsVisible = false;
+			videoViewer.Opacity = 1;
+			progRing.IsVisible = false;// hide loading indicator
+			progRing.IsActive = false;
+			ScanOpeningFolderAndOpenFile(imageToLoaad);
 
 			InitialLoading = false;
 		}
