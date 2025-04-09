@@ -36,6 +36,7 @@ class Program
 			Directory.CreateDirectory(LogFolderPath);
 		}
 		Settings = SettingsHelpers.ReadSettings();
+
 		ImageFileExtensions = new List<string>() { ".webp", ".jpg", ".jpeg", ".png", ".gif" };
 		VideoFileExtensions = new List<string>() { ".mp4", ".webm", ".mkv", ".avi", ".flv", ".mpeg", ".mov", ".asf", ".mpg" };
 		ValidExtensions = new HashSet<string>() { ".webp", ".jpg", ".jpeg", ".png", ".gif",

@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿// Snaked this from Deadpikle at https://github.com/Deadpikle/AvaloniaProgressRing
+using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using System;
@@ -21,15 +22,11 @@ public class ProgressRing : TemplatedControl
 
 	static ProgressRing()
 	{
-		//DefaultStyleKeyProperty.OverrideMetadata(typeof(ProgressRing),
-		//    new FrameworkPropertyMetadata(typeof(ProgressRing)));
 	}
 
 	public ProgressRing()
 	{
 	}
-
-	#region IsActive
 
 	public bool IsActive
 	{
@@ -79,8 +76,6 @@ public class ProgressRing : TemplatedControl
 		get => _ellipseOffset;
 		private set => SetAndRaise(EllipseOffsetProperty, ref _ellipseOffset, value);
 	}
-
-	#endregion
 
 	protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
 	{

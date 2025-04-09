@@ -16,7 +16,7 @@
     </ItemGroup>
     <ItemGroup>
       <AvaloniaResource Include="Images\PeeprBackDrop.png">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </AvaloniaResource>
     </ItemGroup>
     <ItemGroup>

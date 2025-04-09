@@ -30,14 +30,13 @@ public class CustomImageViewer : Image
 			{
 				// We're going to take this off the UI thread to prevent blocking the UI as there could be a lot
 				// of frames to load && later for the animation loop which we could do on a timer but this is
-				// simpler && safer I think with a little bit less overhead
+				// simpler && safer I think, with a little bit less overhead
 				try
 				{
 					using var stream = File.OpenRead(imgPath);
 					using var codec = SKCodec.Create(stream);
 
-					Dispatcher.UIThread.Invoke(() => parentWindow.Title += " | " + 
-						codec.Info.Width + "x" + codec.Info.Height);
+					Dispatcher.UIThread.Invoke(() => parentWindow.Title += $" | {codec.Info.Width}x{codec.Info.Height}");
 					var frameCount = codec.FrameCount;
 					if(frameCount > 1)
 					{
@@ -49,12 +48,10 @@ public class CustomImageViewer : Image
 							using var skBitmap = new SKBitmap(codec.Info.Width, codec.Info.Height);
 							var frameInfo = new SKCodecOptions(i);
 							codec.GetPixels(skBitmap.Info, skBitmap.GetPixels(), frameInfo);
-
 							using var skImage = SKImage.FromBitmap(skBitmap);
 							using var skData = skImage.Encode();
 							using var ms = new MemoryStream(skData.ToArray());
 							var frame = new Bitmap(ms);
-
 							frames.Add((frame, codec.FrameInfo[i].Duration));
 						}
 						RunAnimationLoop = true;
@@ -80,7 +77,6 @@ public class CustomImageViewer : Image
 				}
 				catch(Exception ex)
 				{
-					// TODO logging && notification
 					Helpers.WriteLogEntry(ex.ToString());
 				}
 			});

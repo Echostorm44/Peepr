@@ -1,7 +1,7 @@
-﻿/* Hi there.  Just a quick note to say that yes, I realize that I could have created a view model &&   
+﻿/* Hi there.  Just a quick note to say that yes, I realize that I could have done this in MVVM, created a view model &&   
     Bound everything to the UI && used Commands instead of event handlers && I could have used DI to inject
 	the logging && some of the other stuff && on some larger projects some || all of those things might make sense
-	in this case I am trying to create a small simple project that runs quickly && many of those things would have
+	but in this case I am trying to create a small simple project that runs quickly && many of those things would have
 	created more overhead than they were worth.  I don't believe every class needs an interface, that every method
 	needs unit tests && that using new instead of DI can give you more control over the lifetime of objects && make
 	your code easier to understand.  One of the great things about software engineering is that you can get to the 
@@ -86,7 +86,7 @@ public partial class MainWindow : Window
 				Core.Initialize();
 				libVLC = new LibVLC();
 				CurrentMediaPlayer = new MediaPlayer(libVLC);
-			});
+			}).ConfigureAwait(true);
 
 			CurrentMediaPlayer.EndReached += (_, _) =>
 			{// this is because of a weird quirk where the callback happens on a different thread
@@ -102,7 +102,7 @@ public partial class MainWindow : Window
 					VideoIsSeeking = false;
 				});
 			};
-			// Set initial volume
+
 			chkWarnBeforeDelete.IsChecked = Program.Settings.WarnBeforeDelete;
 			CurrentMediaPlayer.Volume = Program.Settings.VideoVolume;
 			VideoVolumeSlider.Value = Program.Settings.VideoVolume;
@@ -111,7 +111,7 @@ public partial class MainWindow : Window
 			VideoPlayerSeekBarUpdateTimer.Interval = TimeSpan.FromMilliseconds(500);
 			VideoPlayerSeekBarUpdateTimer.Tick += (_, _) => UpdateSeekSlider();
 
-			// Use the forward && back buttons on mouse to navigate
+			// Use the forward && back buttons on 5 button mouse to navigate
 			this.AddHandler(PointerPressedEvent, (me, e) =>
 			{
 				var ptr = e.GetCurrentPoint(this);
@@ -198,7 +198,7 @@ public partial class MainWindow : Window
 		{
 			return;
 		}
-
+		mainGrid.Background = null;// Clear the backdrop when we load a file so it doesn't look weird
 		var allRawFiles = Directory.GetFiles(Path.GetDirectoryName(imageToLoaad)!).ToList();
 		foreach(var item in allRawFiles)
 		{
@@ -308,8 +308,7 @@ public partial class MainWindow : Window
 		var fileInfo = new FileInfo(fileToLoad);
 		var fileSizeReadable = Helpers.FormatFileSize(fileInfo.Length);
 
-		this.Title = fileInfo.Name + " | " + (VisibleFileCounter + 1) + "/" +
-			AllFiles.Count + " | " + fileSizeReadable;
+		this.Title = $"{fileInfo.Name} | {VisibleFileCounter + 1}/{AllFiles.Count} | {fileSizeReadable}";
 		var extension = Path.GetExtension(fileToLoad).ToLower();
 		if(Program.VideoFileExtensions.Contains(extension))
 		{
@@ -478,6 +477,7 @@ public partial class MainWindow : Window
 						{
 							continue;
 						}
+						settings.LatestDownloadedUpdateDate = rel.published_at;
 						foundUpdate = true;
 					}
 				}
@@ -489,6 +489,10 @@ public partial class MainWindow : Window
 					"No", showCancel: true);
 				if(choice)
 				{
+					// save changes to settings file
+					var saveSettings = JsonSerializer.Serialize(settings, 
+						SourceGenerationContext.Default.SetupSettings);
+					File.WriteAllText(settingsPath, saveSettings);
 					// execute the launcher.exe file in the program root folder && close this application immediately
 					var launcherPath = Path.Combine(AppContext.BaseDirectory, "launcher.exe");
 					ProcessStartInfo startInfo = new ProcessStartInfo
@@ -575,6 +579,15 @@ public partial class MainWindow : Window
 		Program.Settings.SlideShowDelaySeconds = (int)(e.NewValue ?? 1);
 		Debouncer.Debounce("SaveSettings", async () =>
 			await SettingsHelpers.SaveSettingsAsync(), 1000);
+	}
+
+	private void OpenLogsFolder(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+	{
+		Process.Start(new ProcessStartInfo
+		{
+			FileName = Program.LogFolderPath,
+			UseShellExecute = true
+		});
 	}
 }
 
