@@ -3,6 +3,9 @@ Peepr is a simple image and video viewer for windows.  I created Peepr because I
 
 So I made Peepr to handle everything itself. It was also a good excuse to try building with AvaloniaUI which I recommend. 
 
+![image](https://github.com/user-attachments/assets/de3e7c0e-5ff5-4578-9b42-d063ec5e6dbf)
+![image](https://github.com/user-attachments/assets/ade44b13-ae94-4f76-b9d9-4cc2e7b062b4)
+
 ## Features
 - Supports all common image formats
 - Supports all common video formats (It uses VLC's library)
