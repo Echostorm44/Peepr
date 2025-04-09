@@ -60,6 +60,7 @@ public class PeeprSettings
 	public int LastX { get; set; }
 	public int LastY { get; set; }
 	public int SlideShowDelaySeconds { get; set; }
+	public DateTime LastestUpdate { get; set; }
 
 	public PeeprSettings()
 	{
@@ -72,7 +73,7 @@ public class PeeprSettings
 	}
 }
 
-//[JsonSourceGenerationOptions(WriteIndented = true, GenerationMode = JsonSourceGenerationMode.Serialization)]
+// We need this for AOT && tree shaking to work correctly
 [JsonSerializable(typeof(PeeprSettings))]
 [JsonSerializable(typeof(SetupSettings))]
 [JsonSerializable(typeof(Asset))]

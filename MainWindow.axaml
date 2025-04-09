@@ -6,7 +6,7 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" Loaded="Window_Loaded"
         x:Class="Peepr.MainWindow" Closing="Window_Closing" WindowStartupLocation="Manual"
 		xmlns:vid="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia" 
-        Title="Peepr">	
+        Title="Peepr" Background="#202020">	
 	<SplitView Name="settingPanel" IsPaneOpen="False" DisplayMode="Overlay" 
 			   PanePlacement="Right"
 			   OpenPaneLength="300">
@@ -28,10 +28,14 @@
 							   Increment="1" ParsingNumberStyle="Integer" 
 							   ValueChanged="SlideShowSecondsChanged"
 							  Focusable="False"></NumericUpDown>
+				<Button Click="OpenLogsFolder" Focusable="False">📁 Log Folder</Button>
 				<Button Click="AboutButtonClick" Focusable="False">💡 About</Button>
 			</StackPanel>
 		</SplitView.Pane>		
-		<Grid Name="mainGrid">			
+		<Grid Name="mainGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+			<Grid.Background>				
+				<ImageBrush Source="\Images\PeeprBackDrop.png"></ImageBrush>
+			</Grid.Background>
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto"></RowDefinition>
 				<RowDefinition Height="*"></RowDefinition>
