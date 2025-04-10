@@ -10,6 +10,7 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <ApplicationIcon>Images\Peepr.ico</ApplicationIcon>
+        <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
       <None Remove="Images\PeeprBackDrop.png" />

@@ -198,6 +198,7 @@ public partial class MainWindow : Window
 		{
 			return;
 		}
+		AllFiles.Clear();
 		mainGrid.Background = null;// Clear the backdrop when we load a file so it doesn't look weird
 		var allRawFiles = Directory.GetFiles(Path.GetDirectoryName(imageToLoaad)!).ToList();
 		foreach(var item in allRawFiles)
@@ -304,6 +305,10 @@ public partial class MainWindow : Window
 			VideoPlayerSeekBarUpdateTimer.Stop();
 			videoViewer.MediaPlayer.Stop();
 			CurrentMovie?.Dispose();
+		}
+		if(imageViewer.cts != null)
+		{
+			imageViewer.cts.Cancel();
 		}
 		var fileInfo = new FileInfo(fileToLoad);
 		var fileSizeReadable = Helpers.FormatFileSize(fileInfo.Length);
