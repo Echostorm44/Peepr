@@ -23,6 +23,8 @@ In the release section either download the install.exe or the Peepr.zip
 Both run as portable but the installer is just a little simpler and puts a shortcut on your desktop.
 If you download the zip, extract it to a folder of your choice and run Peepr.exe
 
+https://github.com/Echostorm44/Peepr/releases
+
 ![image](https://github.com/user-attachments/assets/c4e24077-9de6-4227-9996-68ad9dfa3637)
 
 ![image](https://github.com/user-attachments/assets/941c1669-f215-496f-978f-a2151676e86a)
