@@ -482,7 +482,6 @@ public partial class MainWindow : Window
 						{
 							continue;
 						}
-						settings.LatestDownloadedUpdateDate = rel.published_at;
 						foundUpdate = true;
 					}
 				}
@@ -494,16 +493,12 @@ public partial class MainWindow : Window
 					"No", showCancel: true);
 				if(choice)
 				{
-					// save changes to settings file
-					var saveSettings = JsonSerializer.Serialize(settings, 
-						SourceGenerationContext.Default.SetupSettings);
-					File.WriteAllText(settingsPath, saveSettings);
 					// execute the launcher.exe file in the program root folder && close this application immediately
 					var launcherPath = Path.Combine(AppContext.BaseDirectory, "launcher.exe");
 					ProcessStartInfo startInfo = new ProcessStartInfo
 					{
-						FileName = settings.ExeFileName,
-						UseShellExecute = false,
+						FileName = launcherPath,
+						UseShellExecute = true,
 					};
 					using Process process = new Process { StartInfo = startInfo };
 					process.Start();
