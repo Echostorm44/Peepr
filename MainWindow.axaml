@@ -54,10 +54,12 @@
 								Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" 
 								Foreground="LightBlue" Margin="10">				
 			</local:ProgressRing>
+			<local:ZoomBorder Grid.Row="1" ClipToBounds="True">
 			<local:CustomImageViewer x:Name="imageViewer" Stretch="Uniform" Grid.Row="1"
 									 IsVisible="False" Focusable="False"
 									 HorizontalAlignment="Stretch"
 									 VerticalAlignment="Stretch"/>
+			</local:ZoomBorder>
 			
 			<vid:VideoView x:Name="videoViewer" Grid.Row="1" HorizontalAlignment="Stretch"
 						   IsVisible="True" Focusable="False" IsHitTestVisible="False"

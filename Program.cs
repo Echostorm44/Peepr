@@ -27,22 +27,29 @@ class Program
 	[STAThread]
 	public static void Main(string[] args)
 	{
-		if(!Directory.Exists(DataFolderPath))
+		try
 		{
-			Directory.CreateDirectory(DataFolderPath);
-		}
-		if(!Directory.Exists(LogFolderPath))
-		{
-			Directory.CreateDirectory(LogFolderPath);
-		}
-		Settings = SettingsHelpers.ReadSettings();
+			if(!Directory.Exists(DataFolderPath))
+			{
+				Directory.CreateDirectory(DataFolderPath);
+			}
+			if(!Directory.Exists(LogFolderPath))
+			{
+				Directory.CreateDirectory(LogFolderPath);
+			}
+			Settings = SettingsHelpers.ReadSettings();
 
-		ImageFileExtensions = new List<string>() { ".webp", ".jpg", ".jpeg", ".png", ".gif" };
-		VideoFileExtensions = new List<string>() { ".mp4", ".webm", ".mkv", ".avi", ".flv", ".mpeg", ".mov", ".asf", ".mpg" };
-		ValidExtensions = new HashSet<string>() { ".webp", ".jpg", ".jpeg", ".png", ".gif",
+			ImageFileExtensions = new List<string>() { ".webp", ".jpg", ".jpeg", ".png", ".gif" };
+			VideoFileExtensions = new List<string>() { ".mp4", ".webm", ".mkv", ".avi", ".flv", ".mpeg", ".mov", ".asf", ".mpg" };
+			ValidExtensions = new HashSet<string>() { ".webp", ".jpg", ".jpeg", ".png", ".gif",
 			".mp4", ".webm", ".mkv", ".avi", ".flv", ".mpeg", ".mov", ".asf", ".mpg" };
 
-		BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+			BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+		}
+		catch(Exception ex)
+		{
+			Helpers.WriteLogEntry(ex.ToString());
+		}
 	}
 
 	// Avalonia configuration, don't remove; also used by visual designer.

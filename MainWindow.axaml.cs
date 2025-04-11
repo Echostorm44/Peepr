@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -41,6 +42,12 @@ public partial class MainWindow : Window
 
 	[DllImport("user32.dll")]
 	private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+	[DllImport("user32.dll", SetLastError = true)]
+	private static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+
+	[DllImport("user32.dll")]
+	private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
 
 	IntPtr PeeprWindowHandle;
 	List<string> AllFiles = new List<string>();
@@ -77,7 +84,12 @@ public partial class MainWindow : Window
 			string[] args = Environment.GetCommandLineArgs();
 			var imageToLoaad = args.Skip(1).FirstOrDefault();
 			PeeprWindowHandle = (this.TryGetPlatformHandle()?.Handle) ?? IntPtr.Zero;
-
+			MoveWindow(PeeprWindowHandle, Program.Settings.LastX, Program.Settings.LastY,
+				Program.Settings.LastWidth, Program.Settings.LastHeight, true);
+			if(Program.Settings.IsWindowMaximized)
+			{
+				this.WindowState = WindowState.Maximized;
+			}
 			// Loading VLC can take several seconds but not all the time, I have not found a pattern but when it does
 			// it locaks up the gui thread so we run it in a new thread so the UI isn't blocked && we can show
 			// a spinner to let them know the app is working.
@@ -208,20 +220,42 @@ public partial class MainWindow : Window
 				AllFiles.Add(item);
 			}
 		}
-
+		AllFiles.Sort();
 		VisibleFileCounter = AllFiles.IndexOf(imageToLoaad);
 		LoadImageOrVideo(imageToLoaad);
 	}
 
 	public void ShowNextFile()
 	{
-		VisibleFileCounter = (VisibleFileCounter + 1) % AllFiles.Count;
+		if(AllFiles.Count == 0)
+		{
+			return;
+		}
+		else if(VisibleFileCounter == AllFiles.Count - 1)
+		{
+			VisibleFileCounter = 0;
+		}
+		else
+		{
+			VisibleFileCounter++;
+		}
 		LoadImageOrVideo(AllFiles[VisibleFileCounter]);
 	}
 
 	public void ShowPreviousFile()
 	{
-		VisibleFileCounter = (VisibleFileCounter - 1 + AllFiles.Count) % AllFiles.Count;
+		if(AllFiles.Count == 0)
+		{
+			return;
+		}
+		else if(VisibleFileCounter == 0)
+		{
+			VisibleFileCounter = AllFiles.Count - 1;
+		}
+		else
+		{
+			VisibleFileCounter--;
+		}
 		LoadImageOrVideo(AllFiles[VisibleFileCounter]);
 	}
 
@@ -369,8 +403,15 @@ public partial class MainWindow : Window
 
 	private async void Window_Closing(object? sender, Avalonia.Controls.WindowClosingEventArgs e)
 	{
-		Program.Settings.LastX = this.Position.X;
-		Program.Settings.LastY = this.Position.Y;
+		if(!GetWindowRect(PeeprWindowHandle, out RECT windowRect))
+		{
+			return;
+		}
+		Program.Settings.IsWindowMaximized = this.WindowState == WindowState.Maximized;
+		Program.Settings.LastX = windowRect.Left;
+		Program.Settings.LastY = windowRect.Top;
+		Program.Settings.LastWidth = windowRect.Right - windowRect.Left;
+		Program.Settings.LastHeight = windowRect.Bottom - windowRect.Top;
 		await SettingsHelpers.SaveSettingsAsync();
 	}
 
@@ -433,6 +474,7 @@ public partial class MainWindow : Window
 			videoViewer.IsVisible = false;
 			return;
 		}
+		VisibleFileCounter = Math.Max(VisibleFileCounter - 1, 0);
 		ShowNextFile();
 	}
 
@@ -588,6 +630,40 @@ public partial class MainWindow : Window
 			FileName = Program.LogFolderPath,
 			UseShellExecute = true
 		});
+	}
+}
+
+// RECT structure required by WINDOWPLACEMENT structure
+[Serializable]
+[StructLayout(LayoutKind.Sequential)]
+public struct RECT
+{
+	public int Left;
+	public int Top;
+	public int Right;
+	public int Bottom;
+
+	public RECT(int left, int top, int right, int bottom)
+	{
+		this.Left = left;
+		this.Top = top;
+		this.Right = right;
+		this.Bottom = bottom;
+	}
+}
+
+// POINT structure required by WINDOWPLACEMENT structure
+[Serializable]
+[StructLayout(LayoutKind.Sequential)]
+public struct POINT
+{
+	public int X;
+	public int Y;
+
+	public POINT(int x, int y)
+	{
+		this.X = x;
+		this.Y = y;
 	}
 }
 
