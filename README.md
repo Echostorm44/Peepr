@@ -11,6 +11,7 @@ So I made Peepr to handle everything itself. It was also a good excuse to try bu
 - Supports all common video formats (It uses VLC's library)
 - Navigate using arrow buttons, keyboard arrow keys or forward / back buttons on your mouse 
 - Slideshow! (Delay configurable)
+- Pan and Zoom
 - Escape to close
 - Delete to delete file
 - Optional associate Images and or Videos with Peepr
