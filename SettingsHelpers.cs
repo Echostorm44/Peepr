@@ -59,8 +59,11 @@ public class PeeprSettings
 	public bool WarnBeforeDelete { get; set; }
 	public int LastX { get; set; }
 	public int LastY { get; set; }
+	public int LastHeight { get; set; }
+	public int LastWidth { get; set; }
 	public int SlideShowDelaySeconds { get; set; }
 	public DateTime LastestUpdate { get; set; }
+	public bool IsWindowMaximized { get; set; }
 
 	public PeeprSettings()
 	{
@@ -70,6 +73,9 @@ public class PeeprSettings
 		LastX = 0;
 		LastY = 0;
 		SlideShowDelaySeconds = 3;
+		LastHeight = 800;
+		LastWidth = 1200;
+		IsWindowMaximized = false;
 	}
 }
 
