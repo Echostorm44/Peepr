@@ -67,6 +67,7 @@ public class CustomImageViewer : Image
 							Thread.Sleep(delay);
 						}
 					}
+					Dispatcher.UIThread.Invoke(() => Source = null);
 					//GC.Collect(); // This shouldn't be necessary but if we have memory issues we can try a forced collection maybe do it for all gens
 				}
 				else
