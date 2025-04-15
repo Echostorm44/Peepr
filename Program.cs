@@ -40,9 +40,9 @@ class Program
 			Settings = SettingsHelpers.ReadSettings();
 
 			ImageFileExtensions = new List<string>() { ".webp", ".jpg", ".jpeg", ".png", ".gif" };
-			VideoFileExtensions = new List<string>() { ".mp4", ".webm", ".mkv", ".avi", ".flv", ".mpeg", ".mov", ".asf", ".mpg" };
+			VideoFileExtensions = new List<string>() { ".mp4", ".webm", ".mkv", ".avi", ".flv", ".mpeg", ".mov", ".asf", ".mpg", ".wmv" };
 			ValidExtensions = new HashSet<string>() { ".webp", ".jpg", ".jpeg", ".png", ".gif",
-			".mp4", ".webm", ".mkv", ".avi", ".flv", ".mpeg", ".mov", ".asf", ".mpg" };
+			".mp4", ".webm", ".mkv", ".avi", ".flv", ".mpeg", ".mov", ".asf", ".mpg", ".wmv" };
 
 			BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
 		}
