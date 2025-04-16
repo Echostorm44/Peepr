@@ -11,6 +11,12 @@
         <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
         <ApplicationIcon>Images\Peepr.ico</ApplicationIcon>
         <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+        <Title>Peepr</Title>
+        <Copyright>2025</Copyright>
+        <Description>A simple image and video viewer</Description>
+        <PackageProjectUrl>https://github.com/Echostorm44/Peepr</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Echostorm44/Peepr</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
     </PropertyGroup>
     <ItemGroup>
       <None Remove="Images\PeeprBackDrop.png" />
