@@ -153,6 +153,9 @@ public partial class MainWindow : Window
 					case Avalonia.Input.Key.Delete:
 						DeleteCurrentFile();
 						break;
+					case Avalonia.Input.Key.Space:
+						PlayPauseVideo();
+						break;
 				}
 			};
 
@@ -260,6 +263,11 @@ public partial class MainWindow : Window
 	}
 
 	private void OnTogglePlayPauseClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+	{
+		PlayPauseVideo();
+	}
+
+	private void PlayPauseVideo()
 	{
 		if(CurrentMediaPlayer.IsPlaying)
 		{
